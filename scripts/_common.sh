@@ -9,6 +9,7 @@
 #=================================================
 # PERSONAL HELPERS
 #=================================================
+source /usr/share/yunohost/helpers
 ynh_setup_source2() {
     # ============ Argument parsing =============
     echo "DEBUG: Using modified ynh_setup_source" >&2
