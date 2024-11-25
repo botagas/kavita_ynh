@@ -10,8 +10,9 @@
 # PERSONAL HELPERS
 #=================================================
 source /usr/share/yunohost/helpers
-ynh_setup_source() {
+ynh_setup_source2() {
     # ============ Argument parsing =============
+    echo "DEBUG: Using modified ynh_setup_source" >&2
     local -A args_array=([d]=dest_dir= [s]=source_id= [k]=keep= [r]=full_replace)
     local dest_dir
     local source_id
