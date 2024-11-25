@@ -17,66 +17,6 @@
 #=================================================
 # FUTURE OFFICIAL HELPERS
 #=================================================
-# Download, check integrity, uncompress and patch upstream sources
-#
-# usage: ynh_setup_source --dest_dir=dest_dir [--source_id=source_id] [--keep="file1 file2"] [--full_replace]
-# | arg: --dest_dir=     - Directory where to setup sources
-# | arg: --source_id=    - Name of the source, defaults to `main` (when the sources resource exists in manifest.toml) or (legacy) `app` otherwise
-# | arg: --keep=         - Space-separated list of files/folders that will be backup/restored in $dest_dir, such as a config file you don't want to overwrite. For example 'conf.json secrets.json logs' (no trailing `/` for folders)
-# | arg: --full_replace= - Remove previous sources before installing new sources  (can be 1 or 0, default to 0)
-#
-# This helper will read infos from the 'sources' resources in the `manifest.toml` of the app
-# and expect a structure like:
-#
-# ```toml
-# [resources.sources]
-#     [resources.sources.main]
-#     url = "https://some.address.to/download/the/app/archive"
-#     sha256 = "0123456789abcdef"    # The sha256 sum of the asset obtained from the URL
-# ```
-#
-# (See also the resources documentation which may be more complete?)
-#
-# ##### Optional flags in the 'sources' resource
-#
-# ```text
-# format    = "tar.gz"/xz/bz2/tar # automatically guessed from the extension of the URL, but can be set explicitly. Will use `tar` to extract
-#             "zip"               # automatically guessed from the extension of the URL, but can be set explicitly. Will use `unzip` to extract
-#             "docker"            # useful to extract files from an already-built docker image (instead of rebuilding them locally). Will use `docker-image-extract` to extract
-#             "whatever"          # an arbitrary value, not really meaningful except to imply that the file won't be extracted
-#
-# in_subdir = true    # default, there's an intermediate subdir in the archive before accessing the actual files
-#             false   # sources are directly in the archive root
-#             n       # (special cases) an integer representing a number of subdirs levels to get rid of
-#
-# extract   = true    # default if file is indeed an archive such as .zip, .tar.gz, .tar.bz2, ...
-#           = false   # default if file 'format' is not set and the file is not to be extracted because it is not an archive but a script or binary or whatever asset.
-#                     #    in which case the file will only be `mv`ed to the location possibly renamed using the `rename` value
-#
-# rename    = "whatever_your_want"   # to be used for convenience when `extract` is false and the default name of the file is not practical
-# platform  = "linux/amd64"          # (defaults to "linux/$YNH_ARCH") to be used in conjonction with `format = "docker"` to specify which architecture to extract for
-# ```
-#
-# You may also define assets url and checksum per-architectures such as:
-# ```toml
-# [resources.sources]
-#     [resources.sources.main]
-#     amd64.url = "https://some.address.to/download/the/app/archive/when/amd64"
-#     amd64.sha256 = "0123456789abcdef"
-#     armhf.url = "https://some.address.to/download/the/app/archive/when/armhf"
-#     armhf.sha256 = "fedcba9876543210"
-# ```
-#
-# In which case `ynh_setup_source --dest_dir="$install_dir"` will automatically pick the appropriate source depending on the arch
-#
-# The helper will:
-# - Download the specific URL if there is no local archive
-# - Check the integrity with the specific sha256 sum
-# - Uncompress the archive to `$dest_dir`.
-#   - If `in_subdir` is true, the first level directory of the archive will be removed.
-#   - If `in_subdir` is a numeric value, the N first level directories will be removed.
-# - Patches named `patches/${src_id}/*.patch` will be applied to `$dest_dir`
-# - Apply sane default permissions (see _ynh_apply_default_permissions)
 ynh_setup_source() {
     # ============ Argument parsing =============
     local -A args_array=([d]=dest_dir= [s]=source_id= [k]=keep= [r]=full_replace)
