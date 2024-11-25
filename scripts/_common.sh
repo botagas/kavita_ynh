@@ -31,8 +31,8 @@ ynh_setup_source2() {
             local arch_prefix=".$YNH_ARCH"
         fi
 
-        local src_url="https://github.com/Kareadita/Kavita/releases/download/v0.8.3.2/kavita-linux-x64.tar.gz"
-        local src_sum="6d4a91cfcecd80d710fa16a750206418ea636c44fd158327509a3daf48149e08"
+        local src_url="$(jq -r "$arch_prefix.url" <<< "$sources_json" | sed 's/^null$//')"
+        local src_sum="$(jq -r "$arch_prefix.sha256" <<< "$sources_json" | sed 's/^null$//')"
         local src_sumprg="sha256sum"
         local src_format="$(jq -r ".format" <<< "$sources_json" | sed 's/^null$//')"
         local src_in_subdir="$(jq -r ".in_subdir" <<< "$sources_json" | sed 's/^null$//')"
